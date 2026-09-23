@@ -19,7 +19,7 @@ El plan es por eso más barato, más seguro y no toca la identidad visual que ya
 
 ```bash
 npx tsc --noEmit                 # hoy: 0 errores
-npm run diseno                   # hoy: OK, ninguna zona ha empeorado (peso 1971 · trazo 549 · espaciado 5423)
+npm run diseno                   # hoy: OK · base borderRadius 688 · espaciado 5404 · fontWeight 1971 · trazo 549 · hex 189
 npm run rutas                    # hoy: mapa al día · 0 enlaces rotos · 0 pantallas huérfanas
 ```
 
@@ -30,7 +30,7 @@ npm run rutas                    # hoy: mapa al día · 0 enlaces rotos · 0 pan
 | Fase | Estado | Qué queda exactamente |
 |---|---|---|
 | **1 · Design Tokens** | **CERRADA** | Nada. Las tres puertas pasadas después de aplicar todo: `tsc` 0 · `diseno` OK · `rutas` al día |
-| **2 · Componentes Base** | **EN CURSO — 4 de 5 piezas hechas (24/09/2026)** | Hecho: **`altura.*` adoptada** (12 usos → **37 en 13 ficheros**; `campo` y `boton` ya no están muertos) · **el corazón unificado** (3 versiones → 1) · **`app/ecomerse.tsx` con −28 literales** · la casilla del carrito a 44 dp. **Cerrado con decisión:** el stepper de `food-checkout` se queda como está. Queda: `lifebook`/`food` donde la forma se repita 3 veces (el censo táctil queda **cerrado con regla y decisión**, no con 38 parches — ver §7.3 del doc de tokens) |
+| **2 · Componentes Base** | **EN CURSO — 5 de 6 piezas hechas (24/09/2026)** | Hecho: **`altura.*` adoptada** (12 usos → **37 en 13 ficheros**; `campo` y `boton` ya no están muertos) · **el corazón unificado** (3 versiones → 1) · **`app/ecomerse.tsx` con −28 literales** · la casilla del carrito a 44 dp · **la lámina inferior unificada: 19 sitios en 16 ficheros, 0 píxeles movidos y medido** (§9.1 de los tokens). **Cerrado con decisión:** el stepper de `food-checkout` se queda como está. Queda: **el encabezado de pantalla** (la forma más repetida del proyecto: **21 ficheros**), que **necesita una decisión de Bernardo antes de tocarse** — dónde vive el dueño y si se unifica (§9.2 de los tokens). El censo táctil queda **cerrado con regla y decisión**, no con 38 parches (§7.3) |
 | **3 · Pantallas** | **NO EMPEZADA** | — |
 | **4 · Auditoría final** | **NO EMPEZADA** | — |
 
@@ -39,11 +39,14 @@ los 214 de `600` van a **`medio` (500)** · nombres de radio **`marca` · `chip`
 El detalle y el coste medido de cada una está en el bloque §0 del documento de tokens.
 
 **Lo que la Fase 1 dejó fuera a propósito, y no se debe olvidar:** la migración de los literales a token
-(1.975 de `fontWeight`, 664 de `fontSize`, 724 de `borderRadius`, 550 de `borderWidth`, 5.446 de
+(1.971 de `fontWeight`, 664 de `fontSize`, 688 de `borderRadius`, 549 de `borderWidth`, **5.404** de
 espaciado) **no es Fase 1 — es Fase 3.** La Fase 1 solo declaró las escalas y las puso al día; el código
-sigue escribiendo los mismos números que antes. **Hoy la proporción token/literal es 1,02 y no se ha
-movido ni un punto.** Quien lea «Fase 1 cerrada» y crea que la deuda bajó se equivoca: lo que bajó es la
-*distancia entre lo declarado y lo usado*, que era el problema de verdad.
+sigue escribiendo los mismos números que antes. Quien lea «Fase 1 cerrada» y crea que la deuda bajó se
+equivoca: lo que bajó es la *distancia entre lo declarado y lo usado*, que era el problema de verdad.
+
+**Y sobre la cifra que medía eso mismo: la proporción «1,02» está RETIRADA.** Estaba mal construida —el
+desarrollo está en §4.0— y la buena, emparejando familias comparables, es **0,42**. Las dos fases 1 y 2 no
+la movieron, y no debían: **migrar literales es la Fase 3.**
 
 ---
 
@@ -57,14 +60,14 @@ todas las familias. **Cero cambios de aspecto en la app.**
 | Fichero | Cambio | Sitios |
 |---|---|---|
 | `packages/ui-kit/src/theme/colors.ts` | +6 tokens `*Dark` de texto · +rampa `neutro` de 11 · +`darkColors.sheet` | 18 líneas |
-| `packages/ui-kit/src/theme/escalas.ts` | `peso.maximo: '800'` · `tipografia`: propuesta A o B · `espaciado` a base 2 · `radios` +4 · `trazoIcono` nuevo | 5 bloques |
-| `pruebas/verifica-diseno.cjs` | **Añadir la regla de espaciado** (`(padding\|margin\|gap)[A-Za-z]*:\s*\d+`) y su base | ~10 líneas |
+| `packages/ui-kit/src/theme/escalas.ts` | `peso.maximo: '800'` · `tipografia`: propuesta A o B · `espaciado` a **20 peldaños** (base 2, corregido en §4.1) · `radios` +4 · `trazoIcono` nuevo | 5 bloques |
+| `pruebas/verifica-diseno.cjs` | **Añadir la regla de espaciado** (`(padding\|margin\|gap)[A-Za-z]*:\s*\d+`) y su `precioFigura`… ya está; falta espaciado | ~10 líneas |
 | `.diseno-baseline.json` | Regenerar con `npm run diseno -- --base` **después** de añadir la regla de espaciado | — |
 | `packages/ui-kit/src/index.ts` | Exportar lo nuevo | 5 líneas |
 
 **Decisiones que Bernardo tomó en esta fase — CERRADAS el 24/09/2026:**
 
-- Tipografía: **propuesta A** — 9 peldaños, mueve `micro` −0,5 px y `display` −2 px, y **234 literales
+- Tipografía: **propuesta A** — 9 peldaños, mueve `micro` −0,5 px y `display` −2 px, y **261 literales
   dejan de ser excepción**. (B también tenía 9 peldaños: el borrador decía 8 y 7, y era un error.)
 - Peso: los **214 literales de `600`** van a **`medio` (500)**. Al aplicarlo apareció la razón técnica
   que lo refuerza: la app no declara ninguna `fontFamily` y nunca carga fuentes, así que **`600` es el
@@ -127,11 +130,13 @@ dato inventado—; los casos reales están en la tabla §7.1 del documento de to
 | El stepper de `food-checkout` | **DECIDIDO: se queda como está** (24/09/2026). |
 | `components/ecomerse/useAccionesProducto.ts` | **HECHO.** `ecomerse-tienda` usa el módulo entero y `ecomerse-detail` el corazón. De la tienda desaparecen tres cosas: su `useEffect` de favoritos, su `alternarFavorito` **y su copia de la guarda de combinaciones**. El detalle gana lo que no tenía: la sincronización al montar, así que abrir una ficha por enlace directo ya no enseña el corazón vacío. |
 | `app/ecomerse.tsx` | **HECHO (−28 literales).** 4 `fontWeight`, 1 `borderWidth` y 23 espaciados que ya tenían peldaño. Se quedan `40` y `48` (son anchos de caja, no huecos) y el `0` (un reinicio). |
-| `components/lifebook/*` y `food-*` | **PENDIENTE.** Es lo que queda de la fase, y va por módulo. |
+| `components/lifebook/*` y `food-*` | **LIFEBOOK HECHO (24/09/2026).** La forma que se repetía no era un componente sino una **geometría**: la lámina inferior, idéntica en **17 ficheros**, y su tirador, en 3. Se exportó del fichero que ya la declaraba (`components/lifebook/ui/Sheet.tsx`, cuyo `sheetStyles` estaba exportado y sin usar) y los **19 sitios** la extienden: **0 píxeles movidos, comprobado declaración a declaración** contra el respaldo. El trinquete bajó: `borderRadius 724 → 688 · espaciado 5423 → 5404`. **`food` queda PENDIENTE y con la decisión identificada**: su forma repetida es el **encabezado de pantalla** (6 ficheros de food; **21 en todo el proyecto**), que no tiene dueño y exige decidir dónde vive antes de tocarlo. Medido y **no** tocado: `ACCENT` parecía una copia y resultó ser `brand.primary` en 6 ficheros — **cero deuda**, no se toca |
 
-**La guardia ya lo cobra:** la base pasó de `fontWeight 1975 · borderWidth 550 · espaciado 5446` a
-**`1971 · 549 · 5423`**, con las tres puertas en verde. **Es la primera vez que el trinquete baja por
-trabajo planificado y no por arreglar un defecto concreto.**
+**La guardia ya lo cobra, dos veces:** la primera base pasó de `fontWeight 1975 · borderWidth 550 ·
+espaciado 5446` a **`1971 · 549 · 5423`**; la segunda, con la lámina inferior, a
+**`borderRadius 688 · espaciado 5404`**. **Es la primera vez que el trinquete baja por trabajo
+planificado y no por arreglar un defecto concreto** — y la segunda ya no es un defecto, es deuda
+estructural que se retira.
 
 ### 2.2 Esfuerzo
 
@@ -147,16 +152,6 @@ en todo.** Estimación: **una tanda por módulo** (`ecomerse` → `lifebook` →
 | **Migrar `fontWeight` cambia el peso de media app** | 1.975 literales; los 214 de `600` sí cambian | Fase por módulo, **empezando por el Mercado** (que ya está migrado) para validar el criterio antes de tocar `conductor.tsx` |
 | **Extraer el hook del corazón a `ecomerse-detail` rompe su estado propio** | Esa pantalla guarda estado del producto | Se extrae **solo la acción compartida**, no el estado: mismo patrón que ya funcionó en `ecomerse-subcategoria` |
 | Las tres puertas se quedan rojas a mitad de tanda | El trinquete es por fichero | **Nunca se deja una tanda a medias**: o el fichero queda entero, o no se empieza |
-
-**Riesgos que NO se materializaron, y por qué (24/09/2026):** el hook del corazón se extrajo **sin tocar
-el estado propio** de la ficha —el módulo presta `favIds` y `alternarFavorito`, y la ficha conserva
-combinaciones, cantidad y «comprar ahora»—, así que la ficha no perdió nada. Y la tanda **no se dejó a
-medias**: cerró con `tsc` 0 y la guardia verde.
-
-**Y uno que sí apareció, y no estaba en la tabla: el codemod escribió `trazo.trazo.fino`.** El valor del
-mapa ya llevaba el prefijo y la sustitución lo volvió a poner. **Lo cazó `tsc`; la guardia no podía**
-—cuenta literales, y eso no es un literal—. De aquí sale una regla: **en un codemod el prefijo se pone en
-un solo sitio**, y la verificación de un codemod no es que cambie lo que quieres, sino que `tsc` siga en 0.
 
 ---
 
@@ -209,12 +204,46 @@ deshaga.
 
 | Paso | Cómo |
 |---|---|
-| Repetir el censo de adopción | `_a1-censo-diseno.py` → la proporción token/literal debe pasar de **1,02** a **> 4** |
+| Repetir el censo de adopción | `_a1-censo-diseno.py` → **la proporción EMPAREJADA** (ver la corrección de abajo) debe pasar del **0,42** de hoy a **> 2** |
 | Repetir el contraste | `uiux_check_contrast` con las **44 parejas** (claro + oscuro + los 6 nuevos) → **0 fallos** |
 | Repetir el censo de espaciado | el `grep` de `padding\|margin\|gap` → **% fuera de la escala** debe caer del 54 % a **< 10 %** |
+| Repetir el censo de FORMAS | `_a5-censo-formas-repetidas.py` → las **110 formas en 3+ ficheros** deben bajar; hoy una está cerrada (§9.1 de los tokens) |
 | Recompilar y verificar en el móvil | `compilar-apk.ps1`, instalar con `push` + `pm install -r -d`, capturas por enlace `egrouteplan://` |
 | Cerrar la guardia | `npm run diseno` verde, con la base **muy por debajo** de la de hoy |
 | Acta de cierre | `RECONSTRUCCION-UIUX-CIERRE.md` con la tabla antes/después, y lo que **no** se verificó |
+
+### 4.0 CORRECCIÓN DEL 24/09/2026 — el objetivo «1,02 → > 4» estaba mal construido
+
+**Retiro la cifra que gobierna este paso, y la retiro porque yo mismo la construí mal.** El dato que
+circula por toda la auditoría —**1,02**, y hoy **1,05**— divide **todos** los usos de token (10 familias,
+incluida `tipografia`, que es la más usada del proyecto) entre los literales de **solo cuatro** familias.
+Y el error no es simétrico: mete en el numerador los **455 usos de `espaciado`** y deja fuera del
+denominador los **5.404 literales de esa misma familia**, que es la más grande de todas. Sale una razón
+inglada.
+
+La comparación honesta **empareja las familias que existen en las dos mitades** — las cinco escalas que
+tienen a la vez peldaños declarados y literales en el código:
+
+| Familia | Usos de token | Literales | |
+|---|---:|---:|---|
+| `tipografia` ↔ `fontSize` | 2.462 | 664 | |
+| `peso` ↔ `fontWeight` | 179 | 1.971 | |
+| `radios` ↔ `borderRadius` | 702 | 688 | ← la única familia equilibrada |
+| `trazo` ↔ `borderWidth` | 123 | 549 | |
+| **`espaciado` ↔ `espaciado`** | **455** | **5.404** | ← **el hueco real del proyecto** |
+| **TOTAL** | **3.921** | **9.276** | **proporción 0,42** |
+
+**El número verdadero es 0,42: por cada token hay 2,4 literales.** No cambia el plan —cambia lo lejos que
+está el final, que es justo lo que un objetivo tiene que decir—. La cifra queda corregida en el medidor
+(`_a1-censo-diseno.py` imprime ahora las dos, la histórica y la emparejada, con el motivo) y el objetivo
+de este paso se reescribe sobre la buena.
+
+Dos consecuencias que ordenan la Fase 3:
+
+1. **`espaciado` es el trabajo grande, no `fontWeight`.** 5.404 literales frente a 455 usos: es la peor
+   proporción del proyecto por un factor de 10, y la razón es que la regla que la mide se añadió ayer.
+2. **`radios` ya está equilibrada (702 usos / 688 literales)** y por eso la tanda de la lámina inferior
+   movió `borderRadius` de 724 a 688: en esa familia, migrar de verdad es posible y barato.
 
 ### 4.2 Esfuerzo
 
@@ -245,7 +274,7 @@ FASE 1 (M)  Design Tokens ──────────► desbloquea TODO
 |---|---|---|---|
 | 1 · Design Tokens | **M** | ~40 líneas + 1 decisión grande | — (bloquea a las demás) |
 | 2 · Componentes Base | **L** | 4–5 tandas por módulo | Fase 3, **módulo a módulo** |
-| 3 · Pantallas | **XL** | 192 ficheros / 3.913 literales | Fase 2, **módulo a módulo** |
+| 3 · Pantallas | **XL** | **203 ficheros con deuda** / 9.276 literales (6 familias, cuenta emparejada) | Fase 2, **módulo a módulo** |
 | 4 · Auditoría final | **M** | 1 medición + 1 verificación en móvil | — (es el cierre) |
 
 **Las fases 2 y 3 se solapan a propósito por módulos** —se cierra un módulo entero (componente +
