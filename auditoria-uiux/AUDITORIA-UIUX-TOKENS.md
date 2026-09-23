@@ -31,25 +31,23 @@ son ruido: **3 (181 literales), 7 (168) y 5 (101)**. La corrección está en §4
 |---|---|---|
 | `packages/ui-kit/src/theme/colors.ts` | +6 `*Dark` · +`sheet` · +rampa `neutro` | `tsc` 0 |
 | `packages/ui-kit/src/theme/escalas.ts` | `micro 10,5` · `cuerpo 15` · `subCabecera 17` · `display 26` · `peso.maximo` · `espaciado` (20 peldaños) · `radios` +4 · `trazoIcono` | `tsc` 0 |
-| `packages/ui-kit/src/index.ts` | exporta `neutro` · `trazoIcono` · `type TrazoIcono` | `tsc` 0 |
+| `packages/ui-kit/src/index.ts` | exporta `neutro` · `trazoIcono` · `type TrazoIcono` · `ScreenHeader` | `tsc` 0 |
 | `pruebas/verifica-diseno.cjs` | + regla `ESPACIADO` (era el mayor punto ciego) | — |
-| `.diseno-baseline.json` | regenerado **en el mismo paso** que la regla nueva | `diseno` OK |
+| `.diseno-baseline.json` | regenerado **en el mismo paso** que la regla nueva, y bajado dos veces más (§9.1 y §9.2) | `diseno` OK |
 | **450 usos** de `espaciado` en **34 ficheros** | renombrados por codemod (`xs→e4` … `xxl→e32`), **0 claves viejas** | `tsc` 0 |
 | `app/lifebook-carrito.tsx` | la casilla: Pressable a `altura.punto` (44) con el círculo de 21 dentro | `tsc` 0 |
+| `components/lifebook/ui/Sheet.tsx` + 19 sitios | la geometría de la lámina inferior, exportada y extendida (§9.1) | `tsc` 0 |
+| `packages/ui-kit/src/primitives/ScreenHeader.tsx` | **la cabecera de pantalla unificada (§9.2)**, con el piloto en `app/food-orders.tsx` | `tsc` 0 |
 
-**Las tres puertas, medidas después de todo lo anterior:**
+**Las tres puertas del cierre de la Fase 1, medidas entonces** (la base de hoy, más baja, está en §9.2):
 
 ```
 npx tsc --noEmit   → 0 errores
 npm run diseno     → OK: ninguna zona ha empeorado
-                     hex 189 · fontSize 664 · borderRadius 724 · fontWeight 1971 ·
-                     borderWidth 549 · espaciado 5423 · precioFigura 12
-npm run rutas      → navegación en orden: sin enlaces rotos, mapa al día
+                     hex 189 · fontSize 664 · borderRadius 724 · fontWeight 1975 ·
+                     borderWidth 550 · espaciado 5446 · precioFigura 12
+npm run rutas      → navegación en orden: sin enlaces rotos, mapa al día, 139/542 por el ayudante
 ```
-
-**Y el estado al cerrar la Fase 2, que es el que cuenta:** las mismas tres puertas, con la base **bajada**
-por primera vez por trabajo planificado y no por arreglar un defecto: `fontWeight 1975→1971`,
-`borderWidth 550→549`, `espaciado 5446→5423`. Y `altura.*` pasó de 12 usos en 3 ficheros a **37 en 13**.
 
 ---
 
@@ -235,7 +233,7 @@ de toda la migración cuyo aspecto cambia**, así que son los únicos que hay qu
 Medido en el proyecto, y no era parte del encargo original:
 
 - **`fontFamily`: cero declaraciones en todo el código.** No hay ni una.
-- **`expo-font` está instalado** (en `package.json`) pero **nunca se llama**: `useFonts` y
+- **`expo-font` está instalado (`package.json`, `~/.3`)** pero **nunca se llama**: `useFonts` y
   `Font.loadAsync` tienen **0 apariciones**.
 
 Es decir: **la aplicación no elige su tipografía.** Usa la del sistema operativo y deja el dibujo de las
@@ -337,7 +335,8 @@ podía hacer mientras eran literales sueltos.
 **Los 282 que siguen fuera, y qué son:** **77 son `1`** —un nudo de alineación de un píxel, no un hueco— y
 el resto son anchos de contenedor grandes (26, 28, 30, 40, 48, 60, hasta 130) que **no son «espaciado»
 sino tamaño de caja**, y deben ir a su propia familia el día que se cree. No se inventan peldaños para
-ellos: **un peldaño sin literales que lo pidan no entra.**
+ellos: **un peldaño sin literales que lo pidan no entra.** (El recuento definitivo, con el patrón exacto
+de la guardia, es el del plan de la Fase 3: **245 de 5.459**.)
 
 **Y la guardia quedó arreglada en el mismo paso:** `verifica-diseno.cjs` contaba cinco familias y **no
 contaba el espaciado** — un trinquete que no ve el espaciado no aprieta el espaciado. Se añadió la regla
@@ -528,7 +527,134 @@ que invade al vecino no es una mejora: es un toque que acierta el control de al 
 | Color | 6 (+ rampa de 11 + 1 superficie) | **0** | — | `small` |
 | Peso | **1** (`maximo 800`) | 0 | **1.759 de 1.975** | `large` (migrar) |
 | Tipografía | 2 (`cuerpo 15`, `subCabecera 17`) | 2–3 según A o B | 234 | `large` (migrar) |
-| Espaciado | 20 (con los impares) | **cambia la base** | 5.446 | `large` (migrar) |
+| Espaciado | **20 peldaños** (base 2 → corregido en §4.1: base 2 no puede expresar impares, y eran 450 literales) | **cambia la base** | 5.446 → cobertura 95,7 % de los impares incluidos | `large` (migrar) |
 | Trazo | 4 de icono | 0 | 535 de 550 | `medium` (migrar) |
 | Radios | 4 | 0 | 310 | `medium` (migrar) |
-| Altura | 0 | 0 | 15 sitios ya migrados | `medium` (adoptada en Fase 2) |
+| Altura | 0 | 0 | — | `medium` (auditar los < 44 dp) |
+
+---
+
+## 9. Formas repetidas · la geometría que estaba copiada
+
+**Esta sección no existía, y era un hueco del método.** Las siete anteriores son familias de *valores*
+(color, tamaño, peso, espaciado, trazo, radio, altura). Pero el trinquete cuenta literales y el censo
+`_a1` cuenta adopción de tokens: **ninguno de los dos ve una forma repetida**, porque una forma repetida
+no gasta ningún literal — gasta *sitios*. Diecisiete ficheros escribiendo siete valores idénticos suman
+cero deuda a mano y, sin embargo, son diecisiete sitios que hay que editar a la vez.
+
+Medidor nuevo: **`_a5-censo-formas-repetidas.py`**. Extrae cada `StyleSheet.create` del proyecto, parte
+cada entrada `nombre: { … }` y compara **solo las declaraciones** —no el nombre de la clave—, con
+espacios y orden normalizados. Así `handle` y `barra` con el mismo cuerpo cuentan como la misma forma.
+
+**Resultado global, medido el 24/09/2026:** 310 ficheros · 2.831 entradas de estilo ·
+**110 formas que aparecen en 3 o más ficheros**. Las cuatro mayores:
+
+| Forma | Ficheros | Qué es |
+|---|---|---|
+| `alignItems:'center' flex:1 justifyContent:'center'` | 28 | el centrado de un estado vacío o de carga |
+| **`header`** — `flexDirection:'row' justifyContent:'space-between' borderBottomWidth:1 paddingHorizontal:16 paddingVertical:12` | **21** | **el encabezado de pantalla** |
+| **`sheet`** — absoluta pegada abajo, dos radios de 22, relleno de 18 | **17** | **la lámina inferior** |
+| `topBar` — igual que `header` con `gap:10` y `paddingHorizontal:12` | 10 | la barra superior de las pantallas de lifebook |
+
+### 9.1 La lámina inferior — CERRADA el 24/09/2026 (Fase 2)
+
+**Hecho, y es la primera vez que se cierra una forma repetida.** Los 17 sitios tenían la misma firma
+byte a byte, y **uno de los 17 era su propio dueño**: `components/lifebook/ui/Sheet.tsx` ya declaraba ese
+cuerpo en `sheetStyles.sheet`, **exportado y sin que lo importara nadie**. El tirador (`width 40 / height
+4 / radio 2`) estaba en 3 sitios.
+
+Lo que se hizo no fue crear un componente —eso obligaría a tocar el marcado de 17 pantallas— sino
+**exportar la geometría y extenderla**:
+
+```ts
+export const formaHoja = { position:'absolute', left:0, right:0, bottom:0,
+                           borderTopLeftRadius:22, borderTopRightRadius:22, padding:18 } as const;
+export const formaTirador = { width:40, height:4, borderRadius:2, alignSelf:'center', marginBottom:14 } as const;
+// y cada sitio:  sheet: { ...formaHoja }   ·   handle: { ...formaTirador }
+```
+
+| | |
+|---|---|
+| Sitios unificados | **19** (17 hojas + 2 tiradores), en 16 ficheros + el dueño |
+| De ellos, en `lifebook` | **16 de 17**; el restante es `app/settings.tsx` (`sheetCard`) |
+| Trinquete antes → después | `borderRadius 724 → 688` · `espaciado 5423 → 5404` |
+| Píxeles movidos | **0, y no por razonamiento: medido** |
+| Medidores | `_a6-codemod-forma-hoja.py` (simulación antes de escribir) · `_a7-verifica-forma-hoja.py` |
+
+**Cómo se demuestra que no se movió un píxel.** No basta con decir «es el mismo valor». `_a7` recupera el
+cuerpo ORIGINAL de cada sitio desde el respaldo que el codemod escribe antes de tocar nada, lo compara
+declaración a declaración con el que deja el código, y **resuelve `...formaHoja` leyendo la constante real
+del disco**, no lo que el script crea recordar. Resultado: **19 de 19 idénticos, 0 distintos.**
+
+**Dos trampas que aparecieron y que quedan escritas, porque las dos costaron un intento fallido:**
+
+1. **El trinquete cuenta los literales que están DENTRO de los comentarios, y no distingue el que explica
+   del que escribe.** El primer intento falló porque el bloque de comentario que explicaba el cambio citaba
+   una declaración de relleno con su cifra; el segundo, porque el aviso que advertía de eso **la volvía a
+   citar**. Lección para el que venga: en un fichero vigilado, los valores se explican **con palabras**.
+   (El `_a3` ya lo sabía: un comentario que cita `height: 50` habla del valor, no lo escribe.)
+2. **Un codemod que lee con traducción de saltos y escribe con `newline=''` convierte CRLF en LF sin
+   avisar.** 11 de las 310 fuentes del proyecto están en CRLF —una de ellas, `messaging-sheets.tsx`, es de
+   esta tanda— y el cambio saldría como un diff de 220 líneas donde se tocó una. Ahora el codemod detecta
+   el salto dominante del fichero y escribe el mismo.
+
+### 9.2 La cabecera de pantalla — CERRADA el 24/09/2026 (Fase 2) · `ScreenHeader`
+
+**Era la forma repetida más extendida del proyecto: 21 ficheros**, todos en `app/`, con la firma
+idéntica (`flexDirection:'row'` · `justifyContent:'space-between'` · `borderBottomWidth: 1` · relleno
+horizontal de 16 y vertical de 12). En `food` es literalmente la cabecera de sus seis pantallas.
+
+**Las dos decisiones que pedía esta sección las tomó Bernardo el 24/09/2026, y las dos en el sentido de
+unificar:** el dueño **vive en el kit**, como primitiva oficial, y las 21 variantes **se absorben en un
+solo componente con props**.
+
+**El nombre `StepHeader` no se pudo usar: ya estaba tomado.** Aquí había escrito que el kit tenía
+`StepHeader` y `SearchHeader`; la segunda mitad era imprecisa — **`SearchHeader` no está en el kit**, es
+un componente de la app (`components/SearchHeader.tsx`). Lo que sí está en el kit es `StepHeader`, la
+cabecera de un paso de flujo con barra de progreso segmentada, **sin botón de volver**, importada por 5
+pantallas de KYC. Así que el nuevo se llama **`ScreenHeader`** y el de KYC no se ha tocado.
+
+**Lo que se midió antes de escribirlo, y que desmonta la idea de «21 copias iguales»:** la firma que
+comparten es la de las *declaraciones*. Por dentro, el título se escribía de cuatro maneras y los
+valores no coincidían:
+
+| | Medición |
+|---|---|
+| Origen del estilo del título | clave `headerTitle` **13** · en línea **8** |
+| Tamaño del título | **17** en 15 · **16** en 6 |
+| Peso del título | **800** en 14 · **700** en 7 |
+| Icono de volver | **24** en 14 · **22** en 7 |
+| `numberOfLines` | lo ponen **8** · **13** no lo ponen (y la fila crece sola) |
+
+**El componente** (`packages/ui-kit/src/primitives/ScreenHeader.tsx`): `titulo` · `subtitulo` ·
+`alVolver` (sin ella no hay botón y queda un hueco, que es lo que necesita un esqueleto) ·
+`etiquetaVolver` · `pistaVolver` · `accion` · `lineasTitulo` · `style`.
+
+Las cinco decisiones que toma, todas por mayoría medida y ninguna por gusto: título **17**
+(`tipografia.subCabecera`, el de 15 de 21 — **un token que 15 ficheros escribían a mano y ni uno usaba**),
+peso **`maximo`** (14 de 21), icono **`icono.lg`** (14 de 21), **alto de fila 48 sin tocar**, y el toque
+del volver por **`hitSlop` de 12 por lado** — porque subir la caja a `altura.punto` llevaría la fila a 68
+y cambiaría el alto de las 21 pantallas. Es la regla de §7.3 aplicada al caso que **sí** la admite: un
+control suelto, no una fila con `gap`.
+
+**Un detalle que existe por medición y no por gusto: `lineasTitulo`.** Poner `numberOfLines={1}` en todas
+evita que la fila crezca, pero puede truncar. El ancho disponible son **280 dp** y a 17 le caben **22
+caracteres**, según la calibración de ancho de letra ya contrastada contra el teléfono (**7,9 dp por
+carácter a tamaño 11**, de `_c9-medir-letra-rejilla.cjs`). Medidor nuevo: `_b2-medir-titulos-cabecera.py`.
+Solo **2 de los 21 no caben** —«Alquileres en Guinea Ecuatorial» (31 caracteres, 378 dp) y el nombre del
+comercio de `food-menu`, que es dinámico— y esos dos pasan `lineasTitulo={2}`.
+
+**Estado: el componente está escrito y el piloto aplicado en `app/food-orders.tsx`**, con las tres
+puertas en verde y el trinquete bajando `espaciado 5404 → 5402`, `fontSize 664 → 663`,
+`fontWeight 1971 → 1970`, `borderWidth 549 → 548`. **Y la comprobación no es de previsualización: está
+medida en el móvil de referencia.** `_b4-mide-cabecera.py` descodifica los dos pantallazos a mano y
+encuentra que la fila del borde no se mueve (270 px), que el trazo del icono pasa de 44 a 48 px y que su
+centro vertical queda donde estaba: el icono pasa de **22,0 a 24,0 dp creciendo alrededor de su centro**
+—exactamente lo previsto, porque el trazo de `ArrowLeft` ocupa 16/24 de su caja—. El reemplazo de los 20
+restantes espera el visto bueno de Bernardo. El acta, con la tabla de lo que cambia en cada uno, es
+`TANDA-FASE2-CABECERA-PILOTO.md`.
+
+**Y queda un suelo, medido, para el que venga:** la guardia cuenta los literales que están dentro de los
+comentarios y **no** los distingue del código. En todo el proyecto hay **8 literales de espaciado** dentro
+de un comentario (0,1 %), así que el trinquete de esa familia **nunca bajará de 8**. Es ruido, no deuda —
+pero conviene saberlo antes de perseguir un cero que no existe.
