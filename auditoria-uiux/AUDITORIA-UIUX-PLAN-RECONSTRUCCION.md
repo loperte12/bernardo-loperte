@@ -19,7 +19,7 @@ El plan es por eso más barato, más seguro y no toca la identidad visual que ya
 
 ```bash
 npx tsc --noEmit                 # hoy: 0 errores
-npm run diseno                   # hoy: OK · base borderRadius 688 · espaciado 5404 · fontWeight 1971 · trazo 549 · hex 189
+npm run diseno                   # hoy: OK · base borderRadius 688 · espaciado 5402 · fontWeight 1970 · trazo 548 · hex 189 · fontSize 663
 npm run rutas                    # hoy: mapa al día · 0 enlaces rotos · 0 pantallas huérfanas
 ```
 
@@ -30,8 +30,8 @@ npm run rutas                    # hoy: mapa al día · 0 enlaces rotos · 0 pan
 | Fase | Estado | Qué queda exactamente |
 |---|---|---|
 | **1 · Design Tokens** | **CERRADA** | Nada. Las tres puertas pasadas después de aplicar todo: `tsc` 0 · `diseno` OK · `rutas` al día |
-| **2 · Componentes Base** | **EN CURSO — 5 de 6 piezas hechas (24/09/2026)** | Hecho: **`altura.*` adoptada** (12 usos → **37 en 13 ficheros**; `campo` y `boton` ya no están muertos) · **el corazón unificado** (3 versiones → 1) · **`app/ecomerse.tsx` con −28 literales** · la casilla del carrito a 44 dp · **la lámina inferior unificada: 19 sitios en 16 ficheros, 0 píxeles movidos y medido** (§9.1 de los tokens). **Cerrado con decisión:** el stepper de `food-checkout` se queda como está. Queda: **el encabezado de pantalla** (la forma más repetida del proyecto: **21 ficheros**), que **necesita una decisión de Bernardo antes de tocarse** — dónde vive el dueño y si se unifica (§9.2 de los tokens). El censo táctil queda **cerrado con regla y decisión**, no con 38 parches (§7.3) |
-| **3 · Pantallas** | **NO EMPEZADA** | — |
+| **2 · Componentes Base** | **EN CURSO — 6 de 7 piezas hechas (24/09/2026)** | Hecho: **`altura.*` adoptada** (12 usos → **37 en 13 ficheros**) · **el corazón unificado** (3 versiones → 1) · **`app/ecomerse.tsx` con −28 literales** · la casilla del carrito a 44 dp · **la lámina inferior unificada** (19 sitios, 0 píxeles movidos) · **la cabecera de pantalla: `ScreenHeader` escrito y piloto aplicado en `app/food-orders.tsx`, verificado en el móvil de referencia y medido al píxel** (§9.2 de los tokens y acta `TANDA-FASE2-CABECERA-PILOTO.md`). **Cerrado con decisión:** el stepper de `food-checkout` se queda como está. **Pendiente de su visto bueno:** el reemplazo de las otras 20 cabeceras — es un solo commit y ya está todo medido. El censo táctil queda **cerrado con regla y decisión**, no con 38 parches (§7.3) |
+| **3 · Pantallas** | **PLAN ESCRITO — sin empezar** | `AUDITORIA-UIUX-FASE3-PLAN-ESPACIADO.md`: **13 tandas** por módulo, la primera de 130 literales y la mayor de 699, y las únicas decisiones que hay que tomar antes (los 245 literales sin peldaño, de los que solo **66** son huecos de verdad) |
 | **4 · Auditoría final** | **NO EMPEZADA** | — |
 
 **Decisiones cerradas el 24/09/2026** (reemplazan a §1.1, que las pedía): **propuesta A** de tipografía ·
@@ -39,7 +39,7 @@ los 214 de `600` van a **`medio` (500)** · nombres de radio **`marca` · `chip`
 El detalle y el coste medido de cada una está en el bloque §0 del documento de tokens.
 
 **Lo que la Fase 1 dejó fuera a propósito, y no se debe olvidar:** la migración de los literales a token
-(1.971 de `fontWeight`, 664 de `fontSize`, 688 de `borderRadius`, 549 de `borderWidth`, **5.404** de
+(1.970 de `fontWeight`, 663 de `fontSize`, 688 de `borderRadius`, 548 de `borderWidth`, **5.402** de
 espaciado) **no es Fase 1 — es Fase 3.** La Fase 1 solo declaró las escalas y las puso al día; el código
 sigue escribiendo los mismos números que antes. Quien lea «Fase 1 cerrada» y crea que la deuda bajó se
 equivoca: lo que bajó es la *distancia entre lo declarado y lo usado*, que era el problema de verdad.
@@ -132,11 +132,18 @@ dato inventado—; los casos reales están en la tabla §7.1 del documento de to
 | `app/ecomerse.tsx` | **HECHO (−28 literales).** 4 `fontWeight`, 1 `borderWidth` y 23 espaciados que ya tenían peldaño. Se quedan `40` y `48` (son anchos de caja, no huecos) y el `0` (un reinicio). |
 | `components/lifebook/*` y `food-*` | **LIFEBOOK HECHO (24/09/2026).** La forma que se repetía no era un componente sino una **geometría**: la lámina inferior, idéntica en **17 ficheros**, y su tirador, en 3. Se exportó del fichero que ya la declaraba (`components/lifebook/ui/Sheet.tsx`, cuyo `sheetStyles` estaba exportado y sin usar) y los **19 sitios** la extienden: **0 píxeles movidos, comprobado declaración a declaración** contra el respaldo. El trinquete bajó: `borderRadius 724 → 688 · espaciado 5423 → 5404`. **`food` queda PENDIENTE y con la decisión identificada**: su forma repetida es el **encabezado de pantalla** (6 ficheros de food; **21 en todo el proyecto**), que no tiene dueño y exige decidir dónde vive antes de tocarlo. Medido y **no** tocado: `ACCENT` parecía una copia y resultó ser `brand.primary` en 6 ficheros — **cero deuda**, no se toca |
 
-**La guardia ya lo cobra, dos veces:** la primera base pasó de `fontWeight 1975 · borderWidth 550 ·
+**La guardia ya lo cobra, tres veces:** la primera base pasó de `fontWeight 1975 · borderWidth 550 ·
 espaciado 5446` a **`1971 · 549 · 5423`**; la segunda, con la lámina inferior, a
-**`borderRadius 688 · espaciado 5404`**. **Es la primera vez que el trinquete baja por trabajo
-planificado y no por arreglar un defecto concreto** — y la segunda ya no es un defecto, es deuda
-estructural que se retira.
+**`borderRadius 688 · espaciado 5404`**; la tercera, con el piloto de la cabecera en **un** fichero, a
+**`espaciado 5402 · fontSize 663 · fontWeight 1970 · borderWidth 548`**. **Es la primera vez que el
+trinquete baja por trabajo planificado y no por arreglar un defecto concreto** — el resto ya no es un
+defecto, es deuda estructural que se retira, y en la tercera el descuento es exactamente el previsto: los
+5 literales del fichero piloto y ni uno más.
+
+**Y la cabecera de pantalla se resolvió el 24/09/2026** con las dos decisiones de Bernardo: dueño en el
+kit y las 21 variantes unificadas. Vive en `packages/ui-kit/src/primitives/ScreenHeader.tsx` — se llama
+así, y no `StepHeader`, porque ese nombre ya lo tenía el de KYC. El acta con la medición al píxel está en
+`TANDA-FASE2-CABECERA-PILOTO.md`.
 
 ### 2.2 Esfuerzo
 
@@ -206,8 +213,8 @@ deshaga.
 |---|---|
 | Repetir el censo de adopción | `_a1-censo-diseno.py` → **la proporción EMPAREJADA** (ver la corrección de abajo) debe pasar del **0,42** de hoy a **> 2** |
 | Repetir el contraste | `uiux_check_contrast` con las **44 parejas** (claro + oscuro + los 6 nuevos) → **0 fallos** |
-| Repetir el censo de espaciado | el `grep` de `padding\|margin\|gap` → **% fuera de la escala** debe caer del 54 % a **< 10 %** |
-| Repetir el censo de FORMAS | `_a5-censo-formas-repetidas.py` → las **110 formas en 3+ ficheros** deben bajar; hoy una está cerrada (§9.1 de los tokens) |
+| Repetir el censo de espaciado | `_b1-censo-espaciado.py` → **hoy 245 de 5.459 = 4,5 % fuera de escala**. **Este objetivo también está corregido** (ver §4.0-bis): el «54 %» que decía esta fila era de la escala vieja. Y no se persigue «< 10 %», que ya está cumplido: se persigue que **cada hueco real tenga nombre** y que los 245 queden repartidos en sus tres clases (§2 del plan de la Fase 3) |
+| Repetir el censo de FORMAS | `_a5-censo-formas-repetidas.py` → las **110 formas en 3+ ficheros** deben bajar; hoy dos están cerradas (§9.1 y §9.2 de los tokens) |
 | Recompilar y verificar en el móvil | `compilar-apk.ps1`, instalar con `push` + `pm install -r -d`, capturas por enlace `egrouteplan://` |
 | Cerrar la guardia | `npm run diseno` verde, con la base **muy por debajo** de la de hoy |
 | Acta de cierre | `RECONSTRUCCION-UIUX-CIERRE.md` con la tabla antes/después, y lo que **no** se verificó |
@@ -219,7 +226,7 @@ circula por toda la auditoría —**1,02**, y hoy **1,05**— divide **todos** l
 incluida `tipografia`, que es la más usada del proyecto) entre los literales de **solo cuatro** familias.
 Y el error no es simétrico: mete en el numerador los **455 usos de `espaciado`** y deja fuera del
 denominador los **5.404 literales de esa misma familia**, que es la más grande de todas. Sale una razón
-inglada.
+inflada.
 
 La comparación honesta **empareja las familias que existen en las dos mitades** — las cinco escalas que
 tienen a la vez peldaños declarados y literales en el código:
@@ -244,6 +251,24 @@ Dos consecuencias que ordenan la Fase 3:
    proporción del proyecto por un factor de 10, y la razón es que la regla que la mide se añadió ayer.
 2. **`radios` ya está equilibrada (702 usos / 688 literales)** y por eso la tanda de la lámina inferior
    movió `borderRadius` de 724 a 688: en esa familia, migrar de verdad es posible y barato.
+
+### 4.0-bis SEGUNDA CORRECCIÓN, del mismo día — y es peor que la primera
+
+**El objetivo de espaciado que este plan arrastraba —«bajar del 54 % a menos del 10 %»— ya está cumplido,
+y no lo cumplió la Fase 3: lo cumplió la reconciliación de la Fase 1.** El 54 % se midió contra la escala
+**vieja** (base 4, once peldaños, cobertura 43,9 %). Con los 20 peldaños de hoy, y medido con **el mismo
+patrón que usa la guardia**:
+
+```
+5.459 literales de espaciado     →     245 fuera de la escala = 4,5 %
+```
+
+Cambia la naturaleza de la Fase 3 entera: **migrar el espaciado no es arreglar 5.459 valores mal puestos,
+es ponerle nombre a 5.214 que ya son legales.** El detalle, el reparto por módulo y las 13 tandas están en
+`AUDITORIA-UIUX-FASE3-PLAN-ESPACIADO.md`, cuyo §0 se abre precisamente con esto.
+
+(La primera corrección —la proporción— afectaba a lo lejos que está el final. Esta segunda afecta a **qué
+es el trabajo**. Por eso las dos van escritas y no se borra la equivocada de la instantánea.)
 
 ### 4.2 Esfuerzo
 
